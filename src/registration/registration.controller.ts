@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { RegistrationService } from './registration.service';
 
 @Controller('registration')
@@ -6,7 +6,8 @@ export class RegistrationController {
 
     constructor(private readonly registrationService: RegistrationService){}
 
-    fetchCustomerDetails(payload){
+    @Post()
+    fetchCustomerDetails(@Body() payload){
         return this.registrationService.registerClient(payload);
     }
 }
