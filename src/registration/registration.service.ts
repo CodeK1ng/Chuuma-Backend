@@ -9,10 +9,10 @@ export class RegistrationService {
 
     registerClient(payload){
 
-        console.log(payload.msisdn);
+        console.log(payload);
         
         if(payload.msisdn.substr(0,5) == '26097' || payload.msisdn.substr(0,5) == '26077'){
-            this.fetchCustomerDetailsUrl = '';
+            this.fetchCustomerDetailsUrl = 'http://10.90.90.209:8282/patumba-live/integration/getKYC.php';
         }else if(payload.msisdn.substr(0,5) == '26096' || payload.msisdn.substr(0,5) == '26076'){
             this.fetchCustomerDetailsUrl = 'http://10.10.35.14/patumba-live/integration/getKYC.php';
         }else{
@@ -22,6 +22,8 @@ export class RegistrationService {
                 );
         }
 
+        console.log(this.fetchCustomerDetailsUrl);
+        
         return this.httpService.post<any>(this.fetchCustomerDetailsUrl, payload)
         .toPromise()
         .then(async res => {

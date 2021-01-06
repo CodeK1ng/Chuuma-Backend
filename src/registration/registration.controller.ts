@@ -8,6 +8,8 @@ export class RegistrationController {
 
     @Post()
     fetchCustomerDetails(@Body() payload){
+        console.log(payload);
+        
         return this.registrationService.registerClient(payload);
     }
 }
