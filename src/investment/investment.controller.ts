@@ -12,8 +12,5 @@ export class InvestmentController {
         return this.investmentService.generalInvestment(payload);
     }
 
-    @Post('complete-transaction')
-    completeTransaction(@Body() payload){
-        return this.investmentService.completeTransaction(payload);
-    }
+   
 }

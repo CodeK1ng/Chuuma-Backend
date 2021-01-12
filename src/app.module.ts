@@ -13,6 +13,7 @@ import { GeneralInvestmentModule } from './general-investment/general-investment
 import { InvestmentModule } from './investment/investment.module';
 import { Product } from './entities/product.entity';
 import { Service } from './entities/service.entity';
+import { CompleteTransactionModule } from './complete-transaction/complete-transaction.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -28,7 +29,8 @@ import { Service } from './entities/service.entity';
   }),
   RegistrationModule,
   GeneralInvestmentModule,
-  InvestmentModule],
+  InvestmentModule,
+  CompleteTransactionModule],
   controllers: [AppController],
   providers: [AppService],
 })

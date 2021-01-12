@@ -14,7 +14,7 @@ import { CustomerRepository } from 'src/repositories/customer.repository';
 import { ProductRepository } from 'src/repositories/product.repository';
 import { ServiceRepository } from 'src/repositories/service.repository';
 import { TransactionRepository } from 'src/repositories/transaction.repository';
-import { SuccessResponse } from 'src/responses/success.response';
+import { ErrorResponse, SuccessResponse } from 'src/responses/success.response';
 import { format, addDays, parseISO } from 'date-fns'
 import { Equal } from 'typeorm';
 
@@ -56,11 +56,22 @@ export class InvestmentService {
 
         console.log(customer);
 
+        if(!customer){
+            let res = new ErrorResponse();
+
+            res.status = HttpStatus.BAD_REQUEST;
+            res.message = 'Could not complete transaction';
+            res.error = 'User not found!'
+
+            return res;
+        }
+
         this.customerAccount = await this.accountRepository.findOne({
             where: {
                 msisdn : payload.msisdn
             }
         });
+
 
         let creatAcc = new Account();
 
@@ -114,7 +125,7 @@ export class InvestmentService {
         const matuDate = this.getMaturityDate(payload.tenure, transaction.created_at);
         console.log(matuDate);
         
-        transaction.maturityDate = matuDate.toISOString();
+        transaction.maturityDate = matuDate.toString();
         transaction.serviceId = payload.serviceId;
         transaction.status = 'Pending';
         transaction.unitPrice = 1.0000;
@@ -139,7 +150,7 @@ export class InvestmentService {
 
         return this.httpService.post(PAYMENT_URL, paymentPayload)
         .toPromise()
-        .then( (response) => {
+        .then( async (response) => {
             console.log(response);
             
             const res = new SuccessResponse();
@@ -148,13 +159,36 @@ export class InvestmentService {
                 res.body = response.data;
                 
             if(response.data.status == 'TXN_AUTH_PENDING'){
+                let transactionToUpdate = await this.transactionRepository.findOne({
+                    where: {
+                        id: Equal(createdTransaction.id)
+                    }
+                });
+
+                 transactionToUpdate.externalTransactionID = response.data.transactionReference;
+                 await this.transactionRepository.save(transactionToUpdate);
+
                 return  res;
             }else{
-                console.log(response);
+               
+                let res = new ErrorResponse();
+
+                res.status = HttpStatus.SERVICE_UNAVAILABLE;
+                res.message = 'Could not complete transaction';
+                res.error = 'Request failed with status code 503!'
+
+                return res;
                 
             }
         }).catch(err => {
             console.log(err);
+            let res = new ErrorResponse();
+
+            res.status = HttpStatus.SERVICE_UNAVAILABLE;
+            res.message = 'Could not complete transaction';
+            res.error = 'Request failed with status code 503!'
+
+            return res;
             
         })
     }
@@ -162,7 +196,5 @@ export class InvestmentService {
 
     
 
-    completeTransaction(payload){
-        console.log(payload);
-    }
+    
 }
