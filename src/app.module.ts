@@ -14,14 +14,19 @@ import { InvestmentModule } from './investment/investment.module';
 import { Product } from './entities/product.entity';
 import { Service } from './entities/service.entity';
 import { CompleteTransactionModule } from './complete-transaction/complete-transaction.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
     type: 'mysql',
-    host: 'localhost',
-    port: 3306,
-    username: 'root',
-    password: '',
+    // host: 'localhost',
+    // port: 3306,
+    // username: 'root',
+    // password: '',
+    host: '41.175.8.68',
+      port: 9133,
+      username: 'admin',
+      password: 'H0bb170n@2020',
     database: 'chuuma',
     entities: [User, Customer, Transaction, Account, BalanceToWithdraw, UnitPrice, Product, Service,],
     synchronize: true,
@@ -30,7 +35,8 @@ import { CompleteTransactionModule } from './complete-transaction/complete-trans
   RegistrationModule,
   GeneralInvestmentModule,
   InvestmentModule,
-  CompleteTransactionModule],
+  CompleteTransactionModule,
+  AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })

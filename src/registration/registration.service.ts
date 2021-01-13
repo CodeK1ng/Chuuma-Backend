@@ -71,8 +71,7 @@ export class RegistrationService {
 
         const userDetails = await this.userRepository.findOne({
             where: {
-                msisdn: payload.msisdn,
-                email: payload.email
+                msisdn: payload.msisdn
             }
         });
 
@@ -109,7 +108,15 @@ export class RegistrationService {
                 .then( async cust => {
                     console.log(cust);
                     const userToReturn = await this.userRepository.save(createdUser);
-
+                    const message = 'You are have successfully registered on Chuuma, Start your journey today'
+                    await this.httpService.get<any>("http://sms01.rubicube.org/bulksms/bulksms?username=simbani&password=simbani%40321&type=0&dlr=1&destination="+userToReturn.msisdn+"&source=Chuuma&message="+message)
+            .toPromise()
+            .then(async res => {
+                console.log(res.data);
+                
+            }).catch(err => {
+               
+            });
                     const res = new SuccessResponse();
                     res.status = HttpStatus.OK;
                     res.message = 'User Created Successfully';

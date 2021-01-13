@@ -8,7 +8,7 @@ export class RegistrationController {
 
     @Post()
     fetchCustomerDetails(@Body() payload){
-        console.log(payload);
+        console.log('Registration Payload ======>>>',payload);
         
         return this.registrationService.registerClient(payload);
     }
