@@ -39,7 +39,7 @@ export class Transaction {
     @Column()
     movedToWithdraws: number;
 
-    @Column()
+    @Column({nullable: true})
     externalTransactionID: string;
 
     @Column()

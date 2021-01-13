@@ -100,7 +100,6 @@ export class RegistrationService {
             userData.updated_at = moment().format('YYYY-MM-DD HH:MM:SS');
             userData.created_at = moment().format('YYYY-MM-DD HH:MM:SS');
 
-
             if(response.status == 200){
                 const createdCustomer = this.customerRepository.create(customerData);
                 const createdUser = this.userRepository.create(userData);
