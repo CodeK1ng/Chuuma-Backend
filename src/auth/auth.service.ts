@@ -27,12 +27,12 @@ export class AuthService {
           if(!userData){
             // return { status: 404 };
             throw new HttpException(
-                    'User Not Found, Check Your Email',
+                    'User Not Found, Check Your Phone number',
                     HttpStatus.NOT_FOUND,
                     );
           }else if (userData.status === 400){
             throw new HttpException(
-                'Email or Password was invalid',
+                'Phone number or Password was invalid',
                 HttpStatus.BAD_REQUEST,
                 );
           }else{
@@ -70,7 +70,7 @@ export class AuthService {
                     return user;
                 }else{
                     throw new HttpException(
-                    'Email or Password was invalid',
+                    'Phone number or Password was invalid',
                     HttpStatus.BAD_REQUEST,
                     );
                 

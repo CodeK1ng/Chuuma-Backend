@@ -15,6 +15,7 @@ import { Product } from './entities/product.entity';
 import { Service } from './entities/service.entity';
 import { CompleteTransactionModule } from './complete-transaction/complete-transaction.module';
 import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -36,7 +37,8 @@ import { AuthModule } from './auth/auth.module';
   GeneralInvestmentModule,
   InvestmentModule,
   CompleteTransactionModule,
-  AuthModule],
+  AuthModule,
+  UserModule],
   controllers: [AppController],
   providers: [AppService],
 })
