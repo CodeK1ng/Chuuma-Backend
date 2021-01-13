@@ -26,12 +26,12 @@ export class AuthService {
           console.log("USER DATA===>", userData)
           if(!userData){
             // return { status: 404 };
-            return new HttpException(
+            throw new HttpException(
                     'User Not Found, Check Your Email',
                     HttpStatus.NOT_FOUND,
                     );
           }else if (userData.status === 400){
-            return new HttpException(
+            throw new HttpException(
                 'Email or Password was invalid',
                 HttpStatus.BAD_REQUEST,
                 );
@@ -69,7 +69,7 @@ export class AuthService {
                 if(result == true){
                     return user;
                 }else{
-                    return new HttpException(
+                    throw new HttpException(
                     'Email or Password was invalid',
                     HttpStatus.BAD_REQUEST,
                     );
