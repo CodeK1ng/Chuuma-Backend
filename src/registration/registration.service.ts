@@ -74,8 +74,8 @@ export class RegistrationService {
     }
 
     async registerClient(payload: CustomerDTO): Promise<any>{
-        // const response = await this.fetchClientDetails(payload);
-        const response = this.testing();
+        const response = await this.fetchClientDetails(payload);
+        // const response = this.testing();
         console.log('fetch Data res => ',response);
         console.log(payload);
 
