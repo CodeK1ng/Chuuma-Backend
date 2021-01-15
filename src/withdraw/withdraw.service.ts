@@ -63,9 +63,8 @@ export class WithdrawService {
                 }
             });
     
-            
-    
-            let transaction = new Transaction();
+            if(this.customerAccount.balance > payload.amount){
+                let transaction = new Transaction();
     
             transaction.acountTypeId = payload.productId;
             transaction.amount = payload.amount;
@@ -126,7 +125,7 @@ export class WithdrawService {
                      await this.userService.sendSMS(transactionToUpdate.msisdn, message);
     
                     return  res;
-                    
+
                 }else{
                     transactionToUpdate.status = 'Failed';
                     this.transactionRepository.save(transactionToUpdate);
@@ -137,10 +136,15 @@ export class WithdrawService {
                     throw new HttpException('Could not complete transaction, Please try again after some time.', HttpStatus.BAD_REQUEST); 
                     
                 }
-            }).catch(err => {
-                throw new HttpException('Could not complete transaction, Please try again after some time.', HttpStatus.BAD_REQUEST);
-                
-            })
+                }).catch(err => {
+                    throw new HttpException('Could not complete transaction, Please try again after some time.', HttpStatus.BAD_REQUEST);
+                    
+                })
+            }else{
+                throw new HttpException('You have insuffienct balance.', HttpStatus.BAD_REQUEST);
+            }
+    
+            
         }
 
 }
