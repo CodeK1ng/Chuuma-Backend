@@ -78,8 +78,9 @@ export class InvestmentService {
 
         const matuDate = this.getMaturityDate(payload.tenure, transaction.created_at);
         console.log(matuDate);
-        
-        transaction.maturityDate = matuDate.toString();
+        const md = format(matuDate, 'yyyy-MM-dd HH:MM:SS');
+
+        transaction.maturityDate = md;
         transaction.serviceId = payload.serviceId;
         transaction.status = 'Pending';
         transaction.unitPrice = 1.0000;

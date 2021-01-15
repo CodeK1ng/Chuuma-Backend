@@ -9,10 +9,10 @@ export class AppService {
     const tenure = 91;
     
     const maturityDate = addDays(some, tenure);
-
+    const md = format(maturityDate, 'yyyy-MM-dd HH:MM:SS');
     console.log(maturityDate);
 
-    return maturityDate;
+    return md;
     
   }
 }
