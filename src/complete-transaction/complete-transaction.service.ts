@@ -33,7 +33,7 @@ export class CompleteTransactionService {
         ){}
 
     async completeTransaction(payload){
-        console.log('PAYLOAD FROM CALLBACK ===============>>',payload);
+        console.log('PAYLOAD FROM CALLBACK ===============>>',payload.reference);
 
         let getTransaction = await this.transactionRepository.findOne({
             where: {
@@ -42,29 +42,50 @@ export class CompleteTransactionService {
         });
         
         console.log('Transaction Fetched ==================>',getTransaction);
-        
-        getTransaction.status = 'Success';
-        this.transactionRepository.save(getTransaction);
 
-        const accountToUpdate = await this.accountRepository.findOne({
-            where: {
-                msisdn: getTransaction.msisdn,
-                account_type_id: getTransaction.acountTypeId
-            }
-        });
+        if(payload.status == 'TXN_AUTH_SUCCESSFUL'){
 
-        accountToUpdate.balance = accountToUpdate.balance + getTransaction.units;
-        this.accountRepository.save(accountToUpdate);
+            console.log('Transaction Successfull ==================>');
+            getTransaction.status = 'Success';
+            this.transactionRepository.save(getTransaction);
 
-        const message = "You are have invested K" +getTransaction.amount+ " in Chuuma, your account balance is K " +accountToUpdate.balance+".";
-                    await this.httpService.get<any>("http://sms01.rubicube.org/bulksms/bulksms?username=simbani&password=simbani%40321&type=0&dlr=1&destination="+getTransaction.msisdn+"&source=Chuuma&message="+message)
-                                                    .toPromise()
-                                                    .then(async res => {
-                                                        console.log(res.data);
+            const accountToUpdate = await this.accountRepository.findOne({
+                where: {
+                    msisdn: getTransaction.msisdn,
+                    account_type_id: getTransaction.acountTypeId
+                }
+            });
+
+            accountToUpdate.balance = accountToUpdate.balance + getTransaction.units;
+            this.accountRepository.save(accountToUpdate);
+
+            const message = "You are have invested K" +getTransaction.amount+ " in Chuuma, your account balance is K " +accountToUpdate.balance+".";
+            await this.httpService.get<any>("http://sms01.rubicube.org/bulksms/bulksms?username=simbani&password=simbani%40321&type=0&dlr=1&destination="+getTransaction.msisdn+"&source=Chuuma&message="+message)
+                                                        .toPromise()
+                                                        .then(async res => {
+                                                            console.log(res.data);
+                                                            
+                                                        }).catch(err => {
                                                         
-                                                    }).catch(err => {
-                                                    
-                                                    });
+                                                        });
+        }else{
+
+            getTransaction.status = 'Failed';
+            this.transactionRepository.save(getTransaction);
+
+            const message = "Your attempt to invest in the Chuuma fund failed.";
+            await this.httpService.get<any>("http://sms01.rubicube.org/bulksms/bulksms?username=simbani&password=simbani%40321&type=0&dlr=1&destination="+getTransaction.msisdn+"&source=Chuuma&message="+message)
+                                                        .toPromise()
+                                                        .then(async res => {
+                                                            console.log(res.data);
+                                                            
+                                                        }).catch(err => {
+                                                        
+                                                        });
+
+        }
+        
+        
         
     }
 
