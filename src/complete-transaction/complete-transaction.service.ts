@@ -37,9 +37,11 @@ export class CompleteTransactionService {
 
         let getTransaction = await this.transactionRepository.findOne({
             where: {
-                externalTransactionID: payload.transactionReference
+                externalTransactionID: payload.reference
             }
         });
+        
+        console.log('Transaction Fetched ==================>',getTransaction);
         
         getTransaction.status = 'Success';
         this.transactionRepository.save(getTransaction);

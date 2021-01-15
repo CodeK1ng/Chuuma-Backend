@@ -8,6 +8,8 @@ export class CompleteTransactionController {
 
     @Post()
     completeTransaction(@Body() payload){
+        console.log(payload);
+        
         return this.completeTransactionService.completeTransaction(payload);
     }
 
