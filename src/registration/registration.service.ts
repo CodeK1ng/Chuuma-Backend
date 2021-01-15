@@ -79,6 +79,10 @@ export class RegistrationService {
         console.log('fetch Data res => ',response);
         console.log(payload);
 
+        if(!response.msisdn){
+            throw new HttpException('Please send correct phone number', HttpStatus.BAD_REQUEST);
+        }
+
         const userDetails = await this.userRepository.findOne({
             where: {
                 msisdn: response.msisdn
@@ -190,21 +194,11 @@ export class RegistrationService {
                     }
                 )
                 .catch(err => {
-                    const res = new ErrorResponse();
-                    res.status = HttpStatus.BAD_REQUEST;
-                    res.message = 'Failed to register user';
-                    res.error = err;
 
-                    return res;
+                    return err;
                 })
             }else{
-                console.log('Failed to save info');
-                const res = new ErrorResponse();
-                    res.status = HttpStatus.BAD_REQUEST;
-                    res.message = 'Failed to register user';
-                    res.error = null;
-
-                    return res;
+                throw new HttpException('Something went wrong, Please try again after some time.', HttpStatus.BAD_REQUEST);
             }
 
           }

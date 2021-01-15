@@ -1,4 +1,4 @@
-import { HttpService, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpService, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PAYMENT_URL } from 'src/app-config';
 import { InvetsDTO } from 'src/dto/invest.dto';
@@ -57,13 +57,7 @@ export class InvestmentService {
         console.log(customer);
 
         if(!customer){
-            let res = new ErrorResponse();
-
-            res.status = HttpStatus.BAD_REQUEST;
-            res.message = 'Could not complete transaction';
-            res.error = 'User not found!'
-
-            return res;
+            throw new HttpException('User not found!.', HttpStatus.BAD_REQUEST); 
         }
 
         this.customerAccount = await this.accountRepository.findOne({
@@ -130,24 +124,13 @@ export class InvestmentService {
                 return  res;
             }else{
                
-                let res = new ErrorResponse();
-
-                res.status = HttpStatus.SERVICE_UNAVAILABLE;
-                res.message = 'Could not complete transaction';
-                res.error = 'Request failed with status code 503!'
-
-                return res;
+                throw new HttpException('Could not complete transaction, Please try again after some time.', HttpStatus.BAD_REQUEST); 
                 
             }
         }).catch(err => {
-            console.log(err);
-            let res = new ErrorResponse();
+            
 
-            res.status = HttpStatus.SERVICE_UNAVAILABLE;
-            res.message = 'Could not complete transaction';
-            res.error = 'Request failed with status code 503!'
-
-            return res;
+            return err;
             
         })
     }
