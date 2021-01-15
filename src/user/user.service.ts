@@ -41,4 +41,17 @@ export class UserService {
                 relations: ['accounts','balanceToWithdraw']
             });
           }
+
+
+        sendSMS(msisdn: string, message: string){
+            return this.httpService.get<any>("http://sms01.rubicube.org/bulksms/bulksms?username=simbani&password=simbani%40321&type=0&dlr=1&destination="+msisdn+"&source=Chuuma&message="+message)
+            .toPromise()
+            .then(async res => {
+                console.log(res.data);
+                return res.data;
+                
+            }).catch(err => {
+                return err;
+            });
+        }
 }

@@ -103,7 +103,7 @@ export class InvestmentService {
             "wallet": customer.msisdn
         }
 
-        return this.httpService.post(PAYMENT_URL, paymentPayload)
+        return this.httpService.post(PAYMENT_URL+'/debit', paymentPayload)
         .toPromise()
         .then( async (response) => {
             console.log(response);

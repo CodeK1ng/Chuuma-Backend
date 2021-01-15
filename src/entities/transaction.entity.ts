@@ -18,7 +18,7 @@ export class Transaction {
     @Column()
     unitPrice: number;
 
-    @Column()
+    @Column({nullable: true})
     tenure: number;
 
     @Column()
