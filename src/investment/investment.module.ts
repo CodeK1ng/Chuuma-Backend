@@ -21,7 +21,7 @@ import { ServiceRepository } from 'src/repositories/service.repository';
   controllers: [InvestmentController],
   imports: [
     HttpModule.register({
-      timeout: 10000,
+      timeout: 50000,
       maxRedirects: 5,
     }),
     TypeOrmModule.forFeature([User, Account, User, Transaction, BalanceToWithdraw, Product, Service, ProductRepository, ServiceRepository, CustomerRepository, AccountRepository, UserRepository, TransactionRepository, BalanceToWithdrawRepository ])

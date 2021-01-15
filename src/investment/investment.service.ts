@@ -130,7 +130,7 @@ export class InvestmentService {
         }).catch(err => {
             
 
-            return err;
+            throw new HttpException('Could not complete transaction, Please try again after some time.', HttpStatus.BAD_REQUEST);
             
         })
     }
