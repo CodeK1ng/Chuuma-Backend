@@ -9,6 +9,11 @@ import { UserRepository } from 'src/repositories/user.repository';
 import { User } from 'src/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ErrorResponse, SuccessResponse } from 'src/responses/success.response';
+import { BalanceToWithdraw } from 'src/entities/balanceToWithdraw.entity';
+import { Product } from 'src/entities/product.entity';
+import { ProductRepository } from 'src/repositories/product.repository';
+import { format, addDays, parseISO } from 'date-fns'
+import { BalanceToWithdrawRepository } from 'src/repositories/balanceToWidraw.repository';
 
 @Injectable()
 export class RegistrationService {
@@ -20,9 +25,13 @@ export class RegistrationService {
         @InjectRepository(Customer)
         private readonly customerRepository: CustomerRepository,
         @InjectRepository(Account)
-        private readonly accounRepository: AccountRepository,
+        private readonly accountRepository: AccountRepository,
         @InjectRepository(User)
-        private readonly userRepository: UserRepository
+        private readonly userRepository: UserRepository,
+        @InjectRepository(Product)
+        private readonly productRepository: ProductRepository,
+        @InjectRepository(BalanceToWithdraw)
+        private readonly balanceToWithdrawRepository: BalanceToWithdrawRepository,
         ){}
 
     fetchClientDetails(payload): any{
@@ -52,7 +61,7 @@ export class RegistrationService {
 
     testing(){
         const response = {
-            msisdn: '260762432603',
+            msisdn: '260971042607',
             first_name: 'Daniel',
             last_name: 'Sitali',
             email: 'daniel@mail.com',
@@ -65,23 +74,29 @@ export class RegistrationService {
     }
 
     async registerClient(payload: CustomerDTO): Promise<any>{
-        const response = await this.fetchClientDetails(payload);
+        // const response = await this.fetchClientDetails(payload);
+        const response = this.testing();
         console.log('fetch Data res => ',response);
         console.log(payload);
 
         const userDetails = await this.userRepository.findOne({
             where: {
-                msisdn: payload.msisdn
+                msisdn: response.msisdn
             }
         });
+
+        console.log('User Details ======>>',userDetails);
+        
 
         if (userDetails) {
             console.log(userDetails);
             throw new HttpException('User Already Exist', HttpStatus.CONFLICT);
           } else {
 
-            let customerData = new Customer();
-            let userData = new User();
+            const customerData = new Customer();
+            const userData = new User();
+            
+            
 
             customerData.firstName = response.first_name;
             customerData.lastName = response.last_name;
@@ -90,6 +105,7 @@ export class RegistrationService {
             customerData.idNumber = response.nationalId;
             customerData.updated_at = moment().format('YYYY-MM-DD HH:MM:SS');
             customerData.created_at = moment().format('YYYY-MM-DD HH:MM:SS');
+
             
             userData.customer = customerData;
             userData.password = payload.password;
@@ -100,6 +116,8 @@ export class RegistrationService {
             userData.updated_at = moment().format('YYYY-MM-DD HH:MM:SS');
             userData.created_at = moment().format('YYYY-MM-DD HH:MM:SS');
 
+            
+
             if(response.status == 200){
                 const createdCustomer = this.customerRepository.create(customerData);
                 const createdUser = this.userRepository.create(userData);
@@ -107,15 +125,62 @@ export class RegistrationService {
                 .then( async cust => {
                     console.log(cust);
                     const userToReturn = await this.userRepository.save(createdUser);
+
+                    const customer = await this.customerRepository.findOne({
+                        where: {
+                            msisdn: response.msisdn
+                        },
+                        relations: ['accounts','balanceToWithdraw'],
+                    });
+
+                    console.log('Customer Details ======>>',customer);
+                    
+                    let products = await this.productRepository.find();
+
+                    products.forEach( async product => {
+
+                        let account = new Account;
+                        let balanceToWithAcc = new BalanceToWithdraw();
+                        
+                        account.account_type_id = product.id;
+                        account.balance = 0;
+                        account.msisdn = response.msisdn;
+                        account.customer = customer;
+                        account.created_at = moment().format('YYYY-MM-DD HH:MM:SS');
+                        account.updated_at = moment().format('YYYY-MM-DD HH:MM:SS');
+
+
+                        balanceToWithAcc.account_type_id = product.id;
+                        balanceToWithAcc.balance = 0;
+                        balanceToWithAcc.customer = customer;
+                        balanceToWithAcc.msisdn = response.msisdn;
+                        balanceToWithAcc.created_at = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
+                        balanceToWithAcc.updated_at = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
+
+                        let createdAcc = await this.accountRepository.save(account);
+                        
+                        customer.accounts.push(createdAcc)
+                        await this.customerRepository.save(customer);
+
+                        await this.balanceToWithdrawRepository.save(balanceToWithAcc);
+                        customer.balanceToWithdraw.push(balanceToWithAcc)
+                        await this.customerRepository.save(customer);
+
+                        console.log('==================DONE====================================');
+                        
+
+                    });
+
                     const message = 'You are have successfully registered on Chuuma, Start your journey today'
                     await this.httpService.get<any>("http://sms01.rubicube.org/bulksms/bulksms?username=simbani&password=simbani%40321&type=0&dlr=1&destination="+userToReturn.msisdn+"&source=Chuuma&message="+message)
-            .toPromise()
-            .then(async res => {
-                console.log(res.data);
-                
-            }).catch(err => {
-               
-            });
+                                                    .toPromise()
+                                                    .then(async res => {
+                                                        console.log(res.data);
+                                                        
+                                                    }).catch(err => {
+                                                    
+                                                    });
+                                                
                     const res = new SuccessResponse();
                     res.status = HttpStatus.OK;
                     res.message = 'User Created Successfully';
@@ -148,3 +213,7 @@ export class RegistrationService {
         
     }
 }
+function foreach(arg0: (products: any) => any) {
+    throw new Error('Function not implemented.');
+}
+

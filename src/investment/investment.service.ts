@@ -73,47 +73,6 @@ export class InvestmentService {
         });
 
 
-        let creatAcc = new Account();
-
-        creatAcc.account_type_id = payload.productId;
-        creatAcc.balance = 0;
-        creatAcc.customer = customer;
-        creatAcc.msisdn = customer.msisdn;
-        creatAcc.created_at = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
-        creatAcc.updated_at = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
-
-        if(!this.customerAccount){
-            await this.accountRepository.save(creatAcc);
-            customer.accounts.push(creatAcc)
-            await this.customerRepository.save(customer);
-        }else{
-        }
-
-        const balanceToWith = await this.balanceToWithdrawRepository.findOne({
-            where: {
-                msisdn : Equal(payload.msisdn)
-            }
-        });
-
-        let balanceToWithAcc = new BalanceToWithdraw();
-
-        balanceToWithAcc.account_type_id = payload.productId;
-        balanceToWithAcc.balance = 0;
-        balanceToWithAcc.customer = customer;
-        balanceToWithAcc.msisdn = customer.msisdn;
-        balanceToWithAcc.created_at = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
-        balanceToWithAcc.updated_at = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
-
-        if(!balanceToWith){
-            await this.balanceToWithdrawRepository.save(balanceToWithAcc);
-            customer.balanceToWithdraw.push(balanceToWithAcc)
-            await this.customerRepository.save(customer);
-        }else{
-
-        }
-        
-        
-
         let transaction = new Transaction();
 
         transaction.acountTypeId = payload.productId;

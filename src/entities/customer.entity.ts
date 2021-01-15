@@ -27,16 +27,16 @@ export class Customer{
     @Column()
     status: number;
 
-    @OneToMany(type => Account, account => account.customer)
+    @OneToMany(type => Account, account => account.customer, {cascade: true})
     accounts: Account[]
 
-    @OneToMany(type => Transaction, transaction => transaction.customer)
+    @OneToMany(type => Transaction, transaction => transaction.customer, {cascade: true})
     transaction: Transaction[]
 
-    @OneToMany(type => BalanceToWithdraw, balToWith => balToWith.customer)
+    @OneToMany(type => BalanceToWithdraw, balToWith => balToWith.customer, {cascade: true})
     balanceToWithdraw: BalanceToWithdraw[]
 
-    @OneToOne(() => User, user => user.customer)
+    @OneToOne(() => User, user => user.customer, {cascade: true})
     @JoinColumn()
     user: User;
 

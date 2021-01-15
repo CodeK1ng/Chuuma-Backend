@@ -43,6 +43,27 @@ export class CompleteTransactionService {
         
         getTransaction.status = 'Success';
         this.transactionRepository.save(getTransaction);
+
+        const accountToUpdate = await this.accountRepository.findOne({
+            where: {
+                msisdn: getTransaction.msisdn,
+                account_type_id: getTransaction.acountTypeId
+            }
+        });
+
+        accountToUpdate.balance = accountToUpdate.balance + getTransaction.units;
+        this.accountRepository.save(accountToUpdate);
+
+        const message = "You are have invested K" +getTransaction.amount+ " in Chuuma, your account balance is K " +accountToUpdate.balance+".";
+                    await this.httpService.get<any>("http://sms01.rubicube.org/bulksms/bulksms?username=simbani&password=simbani%40321&type=0&dlr=1&destination="+getTransaction.msisdn+"&source=Chuuma&message="+message)
+                                                    .toPromise()
+                                                    .then(async res => {
+                                                        console.log(res.data);
+                                                        
+                                                    }).catch(err => {
+                                                    
+                                                    });
+        
     }
 
 }
