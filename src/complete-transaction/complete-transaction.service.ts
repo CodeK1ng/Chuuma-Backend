@@ -68,6 +68,7 @@ export class CompleteTransactionService {
                                                         }).catch(err => {
                                                         
                                                         });
+            
         }else{
 
             getTransaction.status = 'Failed';
