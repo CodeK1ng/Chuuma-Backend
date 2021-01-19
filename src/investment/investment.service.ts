@@ -66,20 +66,24 @@ export class InvestmentService {
             }
         });
 
+        console.log("================================================================");
         
+        const curDate = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
 
+        console.log(curDate);
+        
         let transaction = new Transaction();
 
         transaction.acountTypeId = payload.productId;
         transaction.amount = payload.amount;
         transaction.tenure = payload.tenure;
         transaction.msisdn = payload.msisdn;
-        transaction.created_at = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
+        transaction.created_at = curDate;
 
-        const matuDate = this.getMaturityDate(payload.tenure, transaction.created_at);
-        console.log(matuDate);
+        const matuDate = this.getMaturityDate(payload.tenure, curDate);
+        // console.log(matuDate);
         const md = format(matuDate, 'yyyy-MM-dd HH:MM:SS');
-
+        console.log(md);
         transaction.maturityDate = md;
         transaction.serviceId = payload.serviceId;
         transaction.status = 'Pending';
@@ -100,20 +104,21 @@ export class InvestmentService {
             "customerFirstName": customer.firstName,
             "customerLastName": customer.lastName,
             "customerPhone": customer.msisdn,
-            "wallet": customer.msisdn
+            "wallet": customer.msisdn,
+            "apiKey": "da553166-106f-48a6-bbf5-5eb291ec6555"
         }
 
         return this.httpService.post(PAYMENT_URL+'/debit', paymentPayload)
         .toPromise()
         .then( async (response) => {
-            console.log(response);
+            console.log(response.data);
             
-            const res = new SuccessResponse();
-                res.status = HttpStatus.OK;
-                res.message = 'PENDING_APPROVAL';
-                res.body = response.data;
+            // const res = new SuccessResponse();
+            //     res.status = HttpStatus.OK;
+            //     res.message = 'PENDING_APPROVAL';
+            //     res.body = response.data;
                 
-            if(response.data.status == 'TXN_AUTH_PENDING'){
+            if(response.data.status == 200){
                 let transactionToUpdate = await this.transactionRepository.findOne({
                     where: {
                         id: Equal(createdTransaction.id)
@@ -123,7 +128,7 @@ export class InvestmentService {
                  transactionToUpdate.externalTransactionID = response.data.reference;
                  await this.transactionRepository.save(transactionToUpdate);
 
-                return  res;
+                return  response.data;
             }else{
                
                 throw new HttpException('Could not complete transaction, Please try again after some time.', HttpStatus.BAD_REQUEST); 

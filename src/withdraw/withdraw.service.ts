@@ -63,7 +63,7 @@ export class WithdrawService {
                 }
             });
     
-            if(this.customerAccount.balance > payload.amount){
+            if(this.customerAccount.balance >= payload.amount && customer.balanceToWithdraw.find(acc => acc.account_type_id == payload.productId).balance >= payload.amount){
                 let transaction = new Transaction();
     
             transaction.acountTypeId = payload.productId;
