@@ -126,8 +126,9 @@ export class InvestmentService {
                 });
 
                  transactionToUpdate.externalTransactionID = response.data.reference;
-                 await this.transactionRepository.save(transactionToUpdate);
-
+                const updatedTrans = await this.transactionRepository.save(transactionToUpdate);
+                console.log('===================Transaction Updated========================', updatedTrans);
+                
                 return  response.data;
             }else{
                
