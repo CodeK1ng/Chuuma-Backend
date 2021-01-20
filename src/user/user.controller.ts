@@ -15,4 +15,9 @@ export class UserController {
     fetchUserStatements(@Param('msisdn') msisdn: string){
         return this.userService.fetchUserStatement(msisdn);
     }
+
+    @Get('maturities/:msisdn')
+    fetchUserMaturities(@Param('msisdn') msisdn: string){
+        return this.userService.fetchUserMaturities(msisdn);
+    }
 }
