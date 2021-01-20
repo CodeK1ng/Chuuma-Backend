@@ -9,12 +9,14 @@ import { Customer } from 'src/entities/customer.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
 import { Transaction } from 'src/entities/transaction.entity';
+import { UnitPrice } from 'src/entities/unitPrices.entity';
 import { AccountRepository } from 'src/repositories/accounts.repository';
 import { BalanceToWithdrawRepository } from 'src/repositories/balanceToWidraw.repository';
 import { CustomerRepository } from 'src/repositories/customer.repository';
 import { ProductRepository } from 'src/repositories/product.repository';
 import { ServiceRepository } from 'src/repositories/service.repository';
 import { TransactionRepository } from 'src/repositories/transaction.repository';
+import { UnitPricesRepository } from 'src/repositories/unitPrices.repository';
 import { SuccessResponse } from 'src/responses/success.response';
 import { UserService } from 'src/user/user.service';
 import { Equal } from 'typeorm';
@@ -36,6 +38,8 @@ export class WithdrawService {
         private readonly productRepository: ProductRepository,
         @InjectRepository(Account)
         private readonly accountRepository: AccountRepository,
+        @InjectRepository(UnitPrice)
+        private readonly unitPricesRepository: UnitPricesRepository,
         private readonly userService: UserService
         ){}
 
@@ -59,12 +63,24 @@ export class WithdrawService {
     
             this.customerAccount = await this.accountRepository.findOne({
                 where: {
-                    msisdn : payload.msisdn
+                    msisdn : payload.msisdn,
+                    account_type_id: payload.productId
                 }
             });
+
+            let todayUnitPriceList = await this.unitPricesRepository.find({
+                order: {
+                    created_at: 'DESC',
+                },
+                take: 1
+            });
     
-            if(this.customerAccount.balance >= payload.amount && customer.balanceToWithdraw.find(acc => acc.account_type_id == payload.productId).balance >= payload.amount){
-                let transaction = new Transaction();
+            let latestEntry = todayUnitPriceList[0]
+
+            let calculatedUnits = Math.round((payload.amount/latestEntry.unitPrice) * 1000000)/ 1000000;
+    
+            if(customer.accounts.find(acc => acc.account_type_id == payload.productId).balance >= payload.amount && customer.balanceToWithdraw.find(acc => acc.account_type_id == payload.productId).balance >= payload.amount){
+            let transaction = new Transaction();
     
             transaction.acountTypeId = payload.productId;
             transaction.amount = payload.amount;
@@ -73,11 +89,11 @@ export class WithdrawService {
             transaction.maturityDate = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
             transaction.serviceId = payload.serviceId;
             transaction.status = 'Pending';
-            transaction.unitPrice = 1.0000;
-            transaction.units = 1.0000;
+            transaction.unitPrice = latestEntry.unitPrice;
+            transaction.units = calculatedUnits;
             transaction.updated_at = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
             transaction.movedToWithdraws = 0;
-            transaction.maturity_unit_price = 0;
+            transaction.maturity_unit_price =latestEntry.unitPrice;
             transaction.balance = 0
     
             const createdTransaction = await this.transactionRepository.save(transaction);
@@ -120,6 +136,9 @@ export class WithdrawService {
 
                      this.customerAccount.balance = this.customerAccount.balance - transactionToUpdate.units;
                      await this.accountRepository.save(this.customerAccount);
+
+                     let bal2With = customer.balanceToWithdraw.find(acc => acc.account_type_id == payload.productId);
+                     await this.balanceToWithdrawRepository.save(bal2With);
 
                      const message = "You have withdrawn K"+transactionToUpdate.amount+" from the Chuuma fund. Your account balance is K"+this.customerAccount.balance;
                      await this.userService.sendSMS(transactionToUpdate.msisdn, message);

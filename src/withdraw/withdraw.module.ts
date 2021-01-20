@@ -16,6 +16,8 @@ import { UserRepository } from 'src/repositories/user.repository';
 import { Transaction } from 'src/entities/transaction.entity';
 import { TransactionRepository } from 'src/repositories/transaction.repository';
 import { UserService } from 'src/user/user.service';
+import { UnitPrice } from 'src/entities/unitPrices.entity';
+import { UnitPricesRepository } from 'src/repositories/unitPrices.repository';
 
 @Module({
   providers: [WithdrawService, UserService],
@@ -25,7 +27,7 @@ import { UserService } from 'src/user/user.service';
       timeout: 50000,
       maxRedirects: 5,
     }),
-    TypeOrmModule.forFeature([User, Account, User, Transaction, BalanceToWithdraw, Product, Service, ProductRepository, ServiceRepository, CustomerRepository, AccountRepository, UserRepository, TransactionRepository, BalanceToWithdrawRepository ])
+    TypeOrmModule.forFeature([User, Account, User, Transaction, BalanceToWithdraw, Product, Service, UnitPrice, UnitPricesRepository, ProductRepository, ServiceRepository, CustomerRepository, AccountRepository, UserRepository, TransactionRepository, BalanceToWithdrawRepository ])
   ],
 })
 export class WithdrawModule {}
