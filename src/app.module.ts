@@ -17,6 +17,7 @@ import { CompleteTransactionModule } from './complete-transaction/complete-trans
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { WithdrawModule } from './withdraw/withdraw.module';
+import { UnitPriceModule } from './unit-price/unit-price.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -40,7 +41,8 @@ import { WithdrawModule } from './withdraw/withdraw.module';
   CompleteTransactionModule,
   AuthModule,
   UserModule,
-  WithdrawModule],
+  WithdrawModule,
+  UnitPriceModule],
   controllers: [AppController],
   providers: [AppService],
 })

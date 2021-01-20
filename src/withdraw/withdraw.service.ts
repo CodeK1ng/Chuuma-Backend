@@ -79,7 +79,7 @@ export class WithdrawService {
 
             let calculatedUnits = Math.round((payload.amount/latestEntry.unitPrice) * 1000000)/ 1000000;
     
-            if(customer.accounts.find(acc => acc.account_type_id == payload.productId).balance >= payload.amount && customer.balanceToWithdraw.find(acc => acc.account_type_id == payload.productId).balance >= payload.amount){
+            if(customer.accounts.find(acc => acc.account_type_id == payload.productId).balance * latestEntry.unitPrice >= payload.amount && customer.balanceToWithdraw.find(acc => acc.account_type_id == payload.productId).balance  * latestEntry.unitPrice >= payload.amount){
             let transaction = new Transaction();
     
             transaction.acountTypeId = payload.productId;
@@ -138,6 +138,8 @@ export class WithdrawService {
                      await this.accountRepository.save(this.customerAccount);
 
                      let bal2With = customer.balanceToWithdraw.find(acc => acc.account_type_id == payload.productId);
+
+                     bal2With.balance = bal2With.balance - transactionToUpdate.units;
                      await this.balanceToWithdrawRepository.save(bal2With);
 
                      const message = "You have withdrawn K"+transactionToUpdate.amount+" from the Chuuma fund. Your account balance is K"+this.customerAccount.balance;
