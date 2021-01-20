@@ -5,7 +5,7 @@ export class UnitPrice {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: 'decimal' })
+    @Column("double")
     unitPrice: number;
 
     @Column()
