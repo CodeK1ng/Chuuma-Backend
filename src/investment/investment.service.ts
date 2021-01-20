@@ -17,6 +17,8 @@ import { TransactionRepository } from 'src/repositories/transaction.repository';
 import { ErrorResponse, SuccessResponse } from 'src/responses/success.response';
 import { format, addDays, parseISO } from 'date-fns'
 import { Equal } from 'typeorm';
+import { UnitPrice } from 'src/entities/unitPrices.entity';
+import { UnitPricesRepository } from 'src/repositories/unitPrices.repository';
 
 @Injectable()
 export class InvestmentService {
@@ -33,7 +35,9 @@ export class InvestmentService {
         @InjectRepository(Product)
         private readonly productRepository: ProductRepository,
         @InjectRepository(Account)
-        private readonly accountRepository: AccountRepository
+        private readonly accountRepository: AccountRepository,
+        @InjectRepository(UnitPrice)
+        private readonly unitPricesRepository: UnitPricesRepository
         ){}
 
     getMaturityDate(tenure: number, transactionDate){
@@ -71,6 +75,22 @@ export class InvestmentService {
         const curDate = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
 
         console.log(curDate);
+
+        let todayUnitPriceList = await this.unitPricesRepository.find({
+            order: {
+                created_at: 'DESC',
+            },
+            take: 1
+        });
+
+        let latestEntry = todayUnitPriceList[0]
+
+
+        console.log(latestEntry);
+        
+
+        let calculatedUnits = Math.round((payload.amount/latestEntry.unitPrice) * 1000000)/ 1000000;
+        
         
         let transaction = new Transaction();
 
@@ -87,8 +107,8 @@ export class InvestmentService {
         transaction.maturityDate = md;
         transaction.serviceId = payload.serviceId;
         transaction.status = 'Pending';
-        transaction.unitPrice = 1.0000;
-        transaction.units = 1.0000;
+        transaction.unitPrice = latestEntry.unitPrice;
+        transaction.units = calculatedUnits;
         transaction.updated_at = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
         transaction.movedToWithdraws = 0;
         transaction.maturity_unit_price = 0;

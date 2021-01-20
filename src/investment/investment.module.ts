@@ -15,6 +15,8 @@ import { Service } from 'src/entities/service.entity';
 import { Product } from 'src/entities/product.entity';
 import { ProductRepository } from 'src/repositories/product.repository';
 import { ServiceRepository } from 'src/repositories/service.repository';
+import { UnitPrice } from 'src/entities/unitPrices.entity';
+import { UnitPricesRepository } from 'src/repositories/unitPrices.repository';
 
 @Module({
   providers: [InvestmentService],
@@ -24,7 +26,7 @@ import { ServiceRepository } from 'src/repositories/service.repository';
       timeout: 50000,
       maxRedirects: 5,
     }),
-    TypeOrmModule.forFeature([User, Account, User, Transaction, BalanceToWithdraw, Product, Service, ProductRepository, ServiceRepository, CustomerRepository, AccountRepository, UserRepository, TransactionRepository, BalanceToWithdrawRepository ])
+    TypeOrmModule.forFeature([User, Account, User, Transaction, BalanceToWithdraw, Product, Service, UnitPrice, UnitPricesRepository, ProductRepository, ServiceRepository, CustomerRepository, AccountRepository, UserRepository, TransactionRepository, BalanceToWithdrawRepository ])
   ],
 })
 export class InvestmentModule {}

@@ -74,18 +74,18 @@ export class RegistrationService {
     }
 
     async registerClient(payload: CustomerDTO): Promise<any>{
-        const response = await this.fetchClientDetails(payload);
+        //const response = await this.fetchClientDetails(payload);
         // const response = this.testing();
-        console.log('fetch Data res => ',response);
+        //console.log('fetch Data res => ',response);
         console.log(payload);
 
-        if(!response.msisdn){
+        if(!payload.msisdn == null || payload.msisdn.length != 12){
             throw new HttpException('Please send correct phone number', HttpStatus.BAD_REQUEST);
         }
 
         const userDetails = await this.userRepository.findOne({
             where: {
-                msisdn: response.msisdn
+                msisdn: payload.msisdn
             }
         });
 
@@ -102,42 +102,43 @@ export class RegistrationService {
             
             
 
-            customerData.firstName = response.first_name;
-            customerData.lastName = response.last_name;
-            customerData.msisdn = response.msisdn;
-            customerData.status = response.status;
-            customerData.idNumber = response.nationalId;
+            customerData.firstName = payload.first_name;
+            customerData.lastName = payload.last_name;
+            customerData.msisdn = payload.msisdn;
+            customerData.status = 150;
             customerData.updated_at = moment().format('YYYY-MM-DD HH:MM:SS');
             customerData.created_at = moment().format('YYYY-MM-DD HH:MM:SS');
 
             
-            userData.customer = customerData;
-            userData.password = payload.password;
-            userData.address = payload.address;
-            userData.name = response.first_name+' '+response.last_name;
-            userData.email = payload.email;
-            userData.msisdn = customerData.msisdn;
-            userData.updated_at = moment().format('YYYY-MM-DD HH:MM:SS');
-            userData.created_at = moment().format('YYYY-MM-DD HH:MM:SS');
-
             
-
-            if(response.status == 200){
                 const createdCustomer = this.customerRepository.create(customerData);
-                const createdUser = this.userRepository.create(userData);
+                
                 return await this.customerRepository.save(createdCustomer)
                 .then( async cust => {
                     console.log(cust);
-                    const userToReturn = await this.userRepository.save(createdUser);
+
+                   
 
                     const customer = await this.customerRepository.findOne({
                         where: {
-                            msisdn: response.msisdn
+                            msisdn: payload.msisdn
                         },
                         relations: ['accounts','balanceToWithdraw'],
                     });
 
                     console.log('Customer Details ======>>',customer);
+
+                    userData.customer = customer;
+                    userData.password = payload.password;
+                    userData.address = payload.address;
+                    userData.name = payload.first_name+' '+payload.last_name;
+                    userData.email = payload.email;
+                    userData.msisdn = customerData.msisdn;
+                    userData.updated_at = moment().format('YYYY-MM-DD HH:MM:SS');
+                    userData.created_at = moment().format('YYYY-MM-DD HH:MM:SS');
+        
+                    const createdUser = this.userRepository.create(userData);
+                    const userToReturn = await this.userRepository.save(createdUser);
                     
                     let products = await this.productRepository.find();
 
@@ -148,7 +149,7 @@ export class RegistrationService {
                         
                         account.account_type_id = product.id;
                         account.balance = 0;
-                        account.msisdn = response.msisdn;
+                        account.msisdn = payload.msisdn;
                         account.customer = customer;
                         account.created_at = moment().format('YYYY-MM-DD HH:MM:SS');
                         account.updated_at = moment().format('YYYY-MM-DD HH:MM:SS');
@@ -157,7 +158,7 @@ export class RegistrationService {
                         balanceToWithAcc.account_type_id = product.id;
                         balanceToWithAcc.balance = 0;
                         balanceToWithAcc.customer = customer;
-                        balanceToWithAcc.msisdn = response.msisdn;
+                        balanceToWithAcc.msisdn = payload.msisdn;
                         balanceToWithAcc.created_at = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
                         balanceToWithAcc.updated_at = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
 
@@ -197,10 +198,7 @@ export class RegistrationService {
 
                     return err;
                 })
-            }else{
-                throw new HttpException('Something went wrong, Please try again after some time.', HttpStatus.BAD_REQUEST);
-            }
-
+           
           }
 
         

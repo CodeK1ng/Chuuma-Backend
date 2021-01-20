@@ -18,7 +18,7 @@ export class Customer{
     @Column()
     msisdn: string;
 
-    @Column()
+    @Column({nullable: true})
     idNumber: string;
 
     @Column({nullable: true})
