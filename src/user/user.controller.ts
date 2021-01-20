@@ -10,4 +10,9 @@ export class UserController {
     fetchUserData(@Param('msisdn') msisdn: string){
         return this.userService.findByMsisdn(msisdn);
     }
+
+    @Get('statement/:msisdn')
+    fetchUserStatements(@Param('msisdn') msisdn: string){
+        return this.userService.fetchUserStatement(msisdn);
+    }
 }

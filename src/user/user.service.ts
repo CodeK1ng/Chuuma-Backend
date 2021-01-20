@@ -5,13 +5,14 @@ import { BalanceToWithdraw } from 'src/entities/balanceToWithdraw.entity';
 import { Customer } from 'src/entities/customer.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
+import { Transaction } from 'src/entities/transaction.entity';
 import { AccountRepository } from 'src/repositories/accounts.repository';
 import { BalanceToWithdrawRepository } from 'src/repositories/balanceToWidraw.repository';
 import { CustomerRepository } from 'src/repositories/customer.repository';
 import { ProductRepository } from 'src/repositories/product.repository';
 import { ServiceRepository } from 'src/repositories/service.repository';
 import { TransactionRepository } from 'src/repositories/transaction.repository';
-import { Transaction } from 'typeorm';
+
 
 @Injectable()
 export class UserService {
@@ -41,6 +42,19 @@ export class UserService {
                 relations: ['accounts','balanceToWithdraw']
             });
           }
+
+
+        async fetchUserStatement(msisdn: string): Promise<Transaction[]>{
+            return await this.transactionRepository.find({
+                where: {
+                    msisdn: msisdn
+                },
+                order: {
+                    created_at: 'DESC'
+                },
+                take: 10
+            })
+        }
 
 
         sendSMS(msisdn: string, message: string){
