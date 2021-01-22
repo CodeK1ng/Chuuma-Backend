@@ -132,11 +132,6 @@ export class InvestmentService {
         .toPromise()
         .then( async (response) => {
             console.log(response.data);
-            
-            // const res = new SuccessResponse();
-            //     res.status = HttpStatus.OK;
-            //     res.message = 'PENDING_APPROVAL';
-            //     res.body = response.data;
                 
             if(response.data.status == 200){
                 let transactionToUpdate = await this.transactionRepository.findOne({
