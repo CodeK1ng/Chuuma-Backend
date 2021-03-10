@@ -13,7 +13,7 @@ import { ProductRepository } from 'src/repositories/product.repository';
 import { ServiceRepository } from 'src/repositories/service.repository';
 import { TransactionRepository } from 'src/repositories/transaction.repository';
 import { format, addDays, parseISO } from 'date-fns'
-import { MoreThanOrEqual } from 'typeorm';
+import { MoreThan, MoreThanOrEqual } from 'typeorm';
 
 
 @Injectable()
@@ -60,12 +60,13 @@ export class UserService {
 
         async fetchUserMaturities(msisdn: string): Promise<Transaction[]>{
 
-            const curDate = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
+            const curDate = format(new Date(), 'yyyy-MM-dd H:mm:ss');
 
             return await this.transactionRepository.find({
                 where: {
                     msisdn: msisdn,
-                    maturityDate: MoreThanOrEqual(curDate)
+                    status: "Success",
+                    maturityDate: MoreThan(curDate)
                 },
                 order: {
                     maturityDate: 'ASC'

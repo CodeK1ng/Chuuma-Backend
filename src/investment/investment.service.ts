@@ -72,7 +72,7 @@ export class InvestmentService {
 
         console.log("================================================================");
         
-        const curDate = format(new Date(), 'yyyy-MM-dd hh:mm:ss');
+        const curDate = format(new Date(), 'yyyy-MM-dd H:mm:ss');
 
         console.log(curDate);
 
@@ -102,14 +102,14 @@ export class InvestmentService {
 
         const matuDate = this.getMaturityDate(payload.tenure, curDate);
         // console.log(matuDate);
-        const md = format(matuDate, 'yyyy-MM-dd hh:mm:ss');
+        const md = format(matuDate, 'yyyy-MM-dd H:mm:ss');
         console.log(md);
         transaction.maturityDate = md;
         transaction.serviceId = payload.serviceId;
         transaction.status = 'Pending';
         transaction.unitPrice = latestEntry.unitPrice;
         transaction.units = calculatedUnits;
-        transaction.updated_at = format(new Date(), 'yyyy-MM-dd hh:mm:ss');
+        transaction.updated_at = format(new Date(), 'yyyy-MM-dd H:mm:ss');
         transaction.movedToWithdraws = 0;
         transaction.maturity_unit_price = 0;
         transaction.balance = 0
