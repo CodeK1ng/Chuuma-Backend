@@ -177,14 +177,20 @@ export class RegistrationService {
                     });
 
                     const message = 'You are have successfully registered on Chuuma, Start your journey today'
-                    await this.httpService.get<any>("http://sms01.rubicube.org/bulksms/bulksms?username=simbani&password=simbani%40321&type=0&dlr=1&destination="+userToReturn.msisdn+"&source=Chuuma&message="+message)
-                                                    .toPromise()
-                                                    .then(async res => {
-                                                        console.log(res.data);
-                                                        
-                                                    }).catch(err => {
-                                                    
-                                                    });
+                    const smsPayload = {
+                        "originatorId": "Chuuma",
+                        "msisdn": payload.msisdn,
+                        "text": message
+                      }
+                    await this.httpService.post<any>("http://41.175.8.68:8181/bulksms/sms/gariSms.php", smsPayload)
+                    .toPromise()
+                    .then(async res => {
+                        console.log(res.data);
+                        return res.data;
+                        
+                    }).catch(err => {
+                        return err;
+                    });
                                                 
                     const res = new SuccessResponse();
                     res.status = HttpStatus.OK;
@@ -205,6 +211,7 @@ export class RegistrationService {
         
     }
 }
+
 function foreach(arg0: (products: any) => any) {
     throw new Error('Function not implemented.');
 }

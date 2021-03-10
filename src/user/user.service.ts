@@ -76,7 +76,12 @@ export class UserService {
 
 
         sendSMS(msisdn: string, message: string){
-            return this.httpService.get<any>("http://sms01.rubicube.org/bulksms/bulksms?username=simbani&password=simbani%40321&type=0&dlr=1&destination="+msisdn+"&source=Chuuma&message="+message)
+            const payload = {
+                "originatorId": "Chuuma",
+                "msisdn": msisdn,
+                "text": message
+              }
+            return this.httpService.post<any>("http://41.175.8.68:8181/bulksms/sms/gariSms.php", payload)
             .toPromise()
             .then(async res => {
                 console.log(res.data);

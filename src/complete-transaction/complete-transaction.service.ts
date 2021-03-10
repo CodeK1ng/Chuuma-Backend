@@ -60,14 +60,20 @@ export class CompleteTransactionService {
             this.accountRepository.save(accountToUpdate);
 
             const message = "You are have invested K" +getTransaction.amount+ " in Chuuma, your account balance is K " +accountToUpdate.balance+".";
-            await this.httpService.get<any>("http://sms01.rubicube.org/bulksms/bulksms?username=simbani&password=simbani%40321&type=0&dlr=1&destination="+getTransaction.msisdn+"&source=Chuuma&message="+message)
-                                                        .toPromise()
-                                                        .then(async res => {
-                                                            console.log(res.data);
-                                                            
-                                                        }).catch(err => {
-                                                        
-                                                        });
+            const payload = {
+                "originatorId": "Chuuma",
+                "msisdn": getTransaction.msisdn,
+                "text": message
+              }
+            await this.httpService.post<any>("http://41.175.8.68:8181/bulksms/sms/gariSms.php", payload)
+            .toPromise()
+            .then(async res => {
+                console.log(res.data);
+                return res.data;
+                
+            }).catch(err => {
+                return err;
+            });
             
         }else{
 
@@ -75,14 +81,20 @@ export class CompleteTransactionService {
             this.transactionRepository.save(getTransaction);
 
             const message = "Your attempt to invest in the Chuuma fund failed.";
-            await this.httpService.get<any>("http://sms01.rubicube.org/bulksms/bulksms?username=simbani&password=simbani%40321&type=0&dlr=1&destination="+getTransaction.msisdn+"&source=Chuuma&message="+message)
-                                                        .toPromise()
-                                                        .then(async res => {
-                                                            console.log(res.data);
-                                                            
-                                                        }).catch(err => {
-                                                        
-                                                        });
+            const payload = {
+                "originatorId": "Chuuma",
+                "msisdn": getTransaction.msisdn,
+                "text": message
+              }
+            await this.httpService.post<any>("http://41.175.8.68:8181/bulksms/sms/gariSms.php", payload)
+            .toPromise()
+            .then(async res => {
+                console.log(res.data);
+                return res.data;
+                
+            }).catch(err => {
+                return err;
+            });
 
         }
         
