@@ -114,6 +114,11 @@ export class InvestmentService {
         transaction.maturity_unit_price = 0;
         transaction.balance = 0
 
+        console.log("========================Transaction to be written==========================");
+        console.log(transaction);
+        
+        
+
         const createdTransaction = await this.transactionRepository.save(transaction);
         customer.transaction.push(createdTransaction);
         await this.customerRepository.save(customer);
@@ -151,10 +156,7 @@ export class InvestmentService {
                 
             }
         }).catch(err => {
-            
-
             throw new HttpException('Could not complete transaction, Please try again after some time.', HttpStatus.BAD_REQUEST);
-            
         })
     }
 
