@@ -85,13 +85,13 @@ export class WithdrawService {
             transaction.acountTypeId = payload.productId;
             transaction.amount = payload.amount;
             transaction.msisdn = payload.msisdn;
-            transaction.created_at = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
-            transaction.maturityDate = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
+            transaction.created_at = format(new Date(), 'yyyy-MM-dd H:mm:ss');
+            transaction.maturityDate = format(new Date(), 'yyyy-MM-dd H:mm:ss');
             transaction.serviceId = payload.serviceId;
             transaction.status = 'Pending';
             transaction.unitPrice = latestEntry.unitPrice;
             transaction.units = calculatedUnits;
-            transaction.updated_at = format(new Date(), 'yyyy-MM-dd HH:MM:SS');
+            transaction.updated_at = format(new Date(), 'yyyy-MM-dd H:mm:ss');
             transaction.movedToWithdraws = 0;
             transaction.maturity_unit_price =latestEntry.unitPrice;
             transaction.balance = 0
@@ -142,7 +142,7 @@ export class WithdrawService {
                      bal2With.balance = bal2With.balance - transactionToUpdate.units;
                      await this.balanceToWithdrawRepository.save(bal2With);
 
-                     const message = "You have withdrawn K"+transactionToUpdate.amount+" from the Chuuma fund. Your account balance is K"+this.customerAccount.balance;
+                     const message = "You have withdrawn K"+transactionToUpdate.amount+" from the Chuuma fund. Your account balance is K"+this.customerAccount.balance * latestEntry.unitPrice;
                      await this.userService.sendSMS(transactionToUpdate.msisdn, message);
     
                     return  res;
