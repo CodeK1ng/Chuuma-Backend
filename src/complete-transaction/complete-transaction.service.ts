@@ -5,12 +5,14 @@ import { BalanceToWithdraw } from 'src/entities/balanceToWithdraw.entity';
 import { Customer } from 'src/entities/customer.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
+import { UnitPrice } from 'src/entities/unitPrices.entity';
 import { AccountRepository } from 'src/repositories/accounts.repository';
 import { BalanceToWithdrawRepository } from 'src/repositories/balanceToWidraw.repository';
 import { CustomerRepository } from 'src/repositories/customer.repository';
 import { ProductRepository } from 'src/repositories/product.repository';
 import { ServiceRepository } from 'src/repositories/service.repository';
 import { TransactionRepository } from 'src/repositories/transaction.repository';
+import { UnitPricesRepository } from 'src/repositories/unitPrices.repository';
 import { Transaction } from 'typeorm';
 
 @Injectable()
@@ -29,7 +31,9 @@ export class CompleteTransactionService {
         @InjectRepository(Product)
         private readonly productRepository: ProductRepository,
         @InjectRepository(Account)
-        private readonly accountRepository: AccountRepository
+        private readonly accountRepository: AccountRepository,
+        @InjectRepository(UnitPrice)
+        private readonly unitPricesRepository: UnitPricesRepository
         ){}
 
     async completeTransaction(payload){
@@ -55,6 +59,18 @@ export class CompleteTransactionService {
                     account_type_id: getTransaction.acountTypeId
                 }
             });
+
+            let todayUnitPriceList = await this.unitPricesRepository.find({
+                order: {
+                    created_at: 'DESC',
+                },
+                take: 1
+            });
+    
+            let latestEntry = todayUnitPriceList[0]
+    
+    
+            console.log(latestEntry);
 
             accountToUpdate.balance = accountToUpdate.balance + getTransaction.units;
             this.accountRepository.save(accountToUpdate);
