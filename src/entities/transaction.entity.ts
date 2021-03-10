@@ -9,13 +9,13 @@ export class Transaction {
     @Column()
     msisdn: string;
 
-    @Column()
+    @Column({type: "double", precision:12, scale: 6})
     amount: number;
 
-    @Column()
+    @Column({type: "double", precision:12, scale: 6})
     units: number;
 
-    @Column()
+    @Column({type: "double", precision:12, scale: 6})
     unitPrice: number;
 
     @Column({nullable: true})
@@ -30,7 +30,7 @@ export class Transaction {
     @Column()
     serviceId: number;
 
-    @Column()
+    @Column({type: "double", precision:12, scale: 6})
     balance: number;
     
     @Column()

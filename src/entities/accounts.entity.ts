@@ -12,7 +12,7 @@ export class Account {
     @Column()
     account_type_id: number;
 
-    @Column()
+    @Column({type: "double", precision:12, scale: 6})
     balance: number;
 
     @ManyToOne(type => Customer, customer => customer.accounts)

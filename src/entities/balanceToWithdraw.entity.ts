@@ -12,7 +12,7 @@ export class BalanceToWithdraw {
     @Column()
     account_type_id: number;
 
-    @Column()
+    @Column({type: "double", precision:12, scale: 6})
     balance: number;
 
     @Column()
