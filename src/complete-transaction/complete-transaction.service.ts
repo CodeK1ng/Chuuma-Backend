@@ -34,20 +34,20 @@ export class CompleteTransactionService {
         private readonly accountRepository: AccountRepository,
         @InjectRepository(UnitPrice)
         private readonly unitPricesRepository: UnitPricesRepository
-        ){}
+    ) { }
 
-    async completeTransaction(payload){
-        console.log('PAYLOAD FROM CALLBACK ===============>>',payload.reference);
+    async completeTransaction(payload) {
+        console.log('PAYLOAD FROM CALLBACK ===============>>', payload.reference);
 
         let getTransaction = await this.transactionRepository.findOne({
             where: {
                 externalTransactionID: payload.reference
             }
         });
-        
-        console.log('Transaction Fetched ==================>',getTransaction);
 
-        if(payload.status == 'TXN_AUTH_SUCCESSFUL'){
+        console.log('Transaction Fetched ==================>', getTransaction);
+
+        if (payload.status == 'TXN_AUTH_SUCCESSFUL') {
 
             console.log('Transaction Successfull ==================>');
             getTransaction.status = 'Success';
@@ -66,32 +66,32 @@ export class CompleteTransactionService {
                 },
                 take: 1
             });
-    
+
             let latestEntry = todayUnitPriceList[0]
-    
-    
+
+
             console.log(latestEntry);
 
             accountToUpdate.balance = accountToUpdate.balance + getTransaction.units;
             this.accountRepository.save(accountToUpdate);
 
-            const message = "You are have invested K" +getTransaction.amount+ " in Chuuma, your account balance is K " +accountToUpdate.balance+".";
+            const message = "You are have invested K" + getTransaction.amount + " in Chuuma, your account balance is K " + accountToUpdate.balance * latestEntry.unitPrice + ".";
             const payload = {
                 "originatorId": "Chuuma",
                 "msisdn": getTransaction.msisdn,
                 "text": message
-              }
+            }
             await this.httpService.post<any>("http://41.175.8.68:8181/bulksms/sms/gariSms.php", payload)
-            .toPromise()
-            .then(async res => {
-                console.log(res.data);
-                return res.data;
-                
-            }).catch(err => {
-                return err;
-            });
-            
-        }else{
+                .toPromise()
+                .then(async res => {
+                    console.log(res.data);
+                    return res.data;
+
+                }).catch(err => {
+                    return err;
+                });
+
+        } else {
 
             getTransaction.status = 'Failed';
             this.transactionRepository.save(getTransaction);
@@ -101,21 +101,21 @@ export class CompleteTransactionService {
                 "originatorId": "Chuuma",
                 "msisdn": getTransaction.msisdn,
                 "text": message
-              }
+            }
             await this.httpService.post<any>("http://41.175.8.68:8181/bulksms/sms/gariSms.php", payload)
-            .toPromise()
-            .then(async res => {
-                console.log(res.data);
-                return res.data;
-                
-            }).catch(err => {
-                return err;
-            });
+                .toPromise()
+                .then(async res => {
+                    console.log(res.data);
+                    return res.data;
+
+                }).catch(err => {
+                    return err;
+                });
 
         }
-        
-        
-        
+
+
+
     }
 
 }

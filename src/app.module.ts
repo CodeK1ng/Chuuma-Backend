@@ -18,6 +18,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { WithdrawModule } from './withdraw/withdraw.module';
 import { UnitPriceModule } from './unit-price/unit-price.module';
+import { MatureTransactionsModule } from './mature-transactions/mature-transactions.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -42,7 +43,8 @@ import { UnitPriceModule } from './unit-price/unit-price.module';
   AuthModule,
   UserModule,
   WithdrawModule,
-  UnitPriceModule],
+  UnitPriceModule,
+  MatureTransactionsModule],
   controllers: [AppController],
   providers: [AppService],
 })

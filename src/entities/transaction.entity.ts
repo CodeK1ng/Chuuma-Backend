@@ -9,16 +9,16 @@ export class Transaction {
     @Column()
     msisdn: string;
 
-    @Column({type: "double", precision:12, scale: 6})
+    @Column({ type: "double", precision: 12, scale: 6 })
     amount: number;
 
-    @Column({type: "double", precision:12, scale: 6})
+    @Column({ type: "double", precision: 12, scale: 6 })
     units: number;
 
-    @Column({type: "double", precision:12, scale: 6})
+    @Column({ type: "double", precision: 12, scale: 6 })
     unitPrice: number;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     tenure: number;
 
     @Column()
@@ -30,16 +30,16 @@ export class Transaction {
     @Column()
     serviceId: number;
 
-    @Column({type: "double", precision:12, scale: 6})
+    @Column({ type: "double", precision: 12, scale: 6 })
     balance: number;
-    
-    @Column()
+
+    @Column({ type: "double", precision: 12, scale: 6 })
     maturity_unit_price: number;
 
     @Column()
     movedToWithdraws: number;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     externalTransactionID: string;
 
     @Column()
