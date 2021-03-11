@@ -38,41 +38,41 @@ export class InvestmentService {
         private readonly accountRepository: AccountRepository,
         @InjectRepository(UnitPrice)
         private readonly unitPricesRepository: UnitPricesRepository
-        ){}
+    ) { }
 
-    getMaturityDate(tenure: number, transactionDate){
+    getMaturityDate(tenure: number, transactionDate) {
         const date = parseISO(transactionDate);
         const maturityDate = addDays(date, tenure);
         return maturityDate;
-        }
+    }
 
     customerAccount: Account;
 
-    async generalInvestment(payload: InvetsDTO){
+    async generalInvestment(payload: InvetsDTO) {
         console.log(payload);
-        
+
         const customer = await this.customerRepository.findOne({
             where: {
-              msisdn: payload.msisdn,
+                msisdn: payload.msisdn,
             },
-            relations: ['transaction','accounts','balanceToWithdraw'],
-          });
+            relations: ['transaction', 'accounts', 'balanceToWithdraw'],
+        });
 
         console.log(customer);
 
-        if(!customer){
-            throw new HttpException('User not found!.', HttpStatus.BAD_REQUEST); 
+        if (!customer) {
+            throw new HttpException('User not found!.', HttpStatus.BAD_REQUEST);
         }
 
         this.customerAccount = await this.accountRepository.findOne({
             where: {
-                msisdn : payload.msisdn
+                msisdn: payload.msisdn
             }
         });
 
-        console.log("================================================================");
-        
-        const curDate = format(new Date(), 'yyyy-MM-dd H:mm:ss');
+        console.log("============================Were date problem came from====================================");
+
+        const curDate = format(new Date(), 'yyyy-MM-dd hh:mm:ss');
 
         console.log(curDate);
 
@@ -87,11 +87,11 @@ export class InvestmentService {
 
 
         console.log(latestEntry);
-        
 
-        let calculatedUnits = Math.round((payload.amount/latestEntry.unitPrice) * 1000000)/ 1000000;
-        
-        
+
+        let calculatedUnits = Math.round((payload.amount / latestEntry.unitPrice) * 1000000) / 1000000;
+
+
         let transaction = new Transaction();
 
         transaction.acountTypeId = payload.productId;
@@ -102,22 +102,22 @@ export class InvestmentService {
 
         const matuDate = this.getMaturityDate(payload.tenure, curDate);
         // console.log(matuDate);
-        const md = format(matuDate, 'yyyy-MM-dd H:mm:ss');
+        const md = format(matuDate, 'yyyy-MM-dd hh:mm:ss');
         console.log(md);
         transaction.maturityDate = md;
         transaction.serviceId = payload.serviceId;
         transaction.status = 'Pending';
         transaction.unitPrice = latestEntry.unitPrice;
         transaction.units = calculatedUnits;
-        transaction.updated_at = format(new Date(), 'yyyy-MM-dd H:mm:ss');
+        transaction.updated_at = format(new Date(), 'yyyy-MM-dd hh:mm:ss');
         transaction.movedToWithdraws = 0;
         transaction.maturity_unit_price = 0;
         transaction.balance = 0
 
         console.log("========================Transaction to be written==========================");
         console.log(transaction);
-        
-        
+
+
 
         const createdTransaction = await this.transactionRepository.save(transaction);
         customer.transaction.push(createdTransaction);
@@ -133,39 +133,39 @@ export class InvestmentService {
             "apiKey": "da553166-106f-48a6-bbf5-5eb291ec6555"
         }
 
-        return this.httpService.post(PAYMENT_URL+'/debit', paymentPayload)
-        .toPromise()
-        .then( async (response) => {
-            console.log(response.data);
-                
-            if(response.data.status == 200){
-                let transactionToUpdate = await this.transactionRepository.findOne({
-                    where: {
-                        id: Equal(createdTransaction.id)
-                    }
-                });
+        return this.httpService.post(PAYMENT_URL + '/debit', paymentPayload)
+            .toPromise()
+            .then(async (response) => {
+                console.log(response.data);
 
-                 transactionToUpdate.externalTransactionID = response.data.body.reference;
-                const updatedTrans = await this.transactionRepository.save(transactionToUpdate);
-                console.log('===================Transaction Updated========================', updatedTrans);
-                
-                return  response.data;
-            }else{
-               
-                
+                if (response.data.status == 200) {
+                    let transactionToUpdate = await this.transactionRepository.findOne({
+                        where: {
+                            id: Equal(createdTransaction.id)
+                        }
+                    });
 
-                throw new HttpException('Could not complete transaction, Please try again after some time.', HttpStatus.BAD_REQUEST); 
+                    transactionToUpdate.externalTransactionID = response.data.body.reference;
+                    const updatedTrans = await this.transactionRepository.save(transactionToUpdate);
+                    console.log('===================Transaction Updated========================', updatedTrans);
 
-                
-                
-            }
-        }).catch(err => {
-            throw new HttpException('Could not complete transaction, Please try again after some time.', HttpStatus.BAD_REQUEST);
-        })
+                    return response.data;
+                } else {
+
+
+
+                    throw new HttpException('Could not complete transaction, Please try again after some time.', HttpStatus.BAD_REQUEST);
+
+
+
+                }
+            }).catch(err => {
+                throw new HttpException('Could not complete transaction, Please try again after some time.', HttpStatus.BAD_REQUEST);
+            })
     }
 
 
-    
 
-    
+
+
 }
